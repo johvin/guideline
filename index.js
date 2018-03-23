@@ -17,6 +17,7 @@ function isArray(arr) {
 function Guideline(guideOptions, callback) {
   // hint text font-size setting
   this.hintFontSize = 24;
+  this.hintTextMaxWidth = 400;
   this.guideOptions = isArray(guideOptions)
     ? guideOptions.filter(it => typeof it === 'object' && typeof it.content === 'string' && it.content.trim().length > 0)
     : [];
@@ -110,30 +111,108 @@ Guideline.prototype = {
   adjustGuideHintRootElementPosition: function () {
     if (this.guideElement) {
 
+      // hint is at the bottom of the guide element
+      const isBottom = this.guideRelativePosition === 'bottom';
+
       // Making guideElement scroll into view before invoking getBoundingClientRect
       // can cover the case that the guideElement's parent or grandfather has a fixed position which leads to
       // guideline's height equals to window.innerHeight, in the meanwhile the guideElement's computed top is greater than window.innerHeight
       // in which case the guide hint element will be outside of the screen.
-      this.guideElement.scrollIntoViewIfNeeded();
+      if (this.guideElement.scrollIntoViewIfNeeded) {
+        this.guideElement.scrollIntoViewIfNeeded();
+      } else {
+        // note: some browser do not support scrollIntoViewIfNeeded() now.
+        this.guideElement.scrollIntoView(isBottom);
+      }
       const {
         left,
         right,
         top,
         bottom
       } = this.guideElement.getBoundingClientRect();
-      // const winWidth = window.innerWidth;
-      // const textPadding = 10;
-      // let hintWidth = this.currentHintOption.content.length * this.hintFontSize + textPadding * 2;
 
-      // if (hintWidth > winWidth) {
-      //   hintWidth = winWidth;
-      // }
+      const winWidth = window.innerWidth;
+      // hint text padding
+      const textPadding = 10;
+      let hintWidth = this.calcHintTextWidth(this.hintFontSize, this.currentHintOption.content) + textPadding * 2;
+      
+      hintWidth = Math.ceil(hintWidth);
+      if (hintWidth > this.hintTextMaxWidth) {
+        hintWidth = this.hintTextMaxWidth;
+      }
 
-      const verticalPosition = this.guideRelativePosition === 'bottom' ? `top: ${bottom + 20}px` : `bottom: ${window.innerHeight - top + 20}px`;
-      this.guideHintRootElement.style.cssText = `left: ${(left + right) >> 1}px; ${verticalPosition}; transform: translate(-50%, 0);`;
+      // guide element x center
+      const elemXCenter = (left + right) >> 1;
+      // calc hint text x center 
+      let hintXCenter = elemXCenter;
+      if (hintXCenter + hintWidth / 2 > winWidth) {
+        hintXCenter = Math.floor(winWidth - hintWidth / 2);
+      }
+
+      if (hintXCenter - hintWidth / 2 < 0) {
+        hintXCenter = Math.ceil(hintWidth / 2);
+      }
+
+      // hint root element left coordinatee
+      const hintLeft = Math.floor(hintXCenter - hintWidth / 2);
+      // svg line coordinate
+      const linePos = {};
+      const svgHeight = 50;
+      
+      if (isBottom) {
+        linePos.x1 = hintWidth >> 1;
+        linePos.y1 = svgHeight;
+        linePos.x2 = elemXCenter - hintLeft;
+        linePos.y2 = 0;
+      } else {
+        linePos.x1 = elemXCenter - hintLeft;
+        linePos.y1 = 0;
+        linePos.x2 = hintWidth >> 1;
+        linePos.y2 = svgHeight;
+      }
+
+      const verticalPosition = isBottom ? `top: ${bottom + 20}px` : `bottom: ${window.innerHeight - top + 20}px`;
+      const paddingVertical = `padding-${isBottom ? 'top' : 'bottom'}: ${svgHeight}px`;
+      this.guideHintRootElement.style.cssText = `${paddingVertical}; left: ${hintLeft}px; width: ${hintWidth}px; ${verticalPosition};`;
+
+      // svg setting
+      const svg = this.guideHintRootElement.querySelector('svg');
+      const line = svg.querySelector('line');
+      svg.setAttribute('width', hintWidth);
+      svg.setAttribute('height', svgHeight);
+      
+      if (isBottom) {
+        svg.style.top = 0;
+        svg.style.bottom = 'auto';
+      } else {
+        svg.style.top = 'auto';
+        svg.style.bottom = 0;
+      }
+
+      Object.keys(linePos).forEach((attr) => {
+        line.setAttribute(attr, linePos[attr]);
+      });
     } else {
       this.guideHintRootElement.style.cssText = `left: 50%; top: 50%; transform: translate(-50%, -50%);`;
+      const svg = this.guideHintRootElement.querySelector('svg');
+      svg.setAttribute('width', 0);
+      svg.setAttribute('height', 0);
     }
+  },
+
+  // calculate the layout width of hint text
+  calcHintTextWidth: function (fontSize, text) {
+    const span = document.createElement('span');
+    span.style.display = 'inline-block';
+    span.style.visibility = 'hidden';
+    span.style.fontSize = fontSize + 'px';
+    span.innerText = text;
+    
+    document.body.appendChild(span);
+    const rect = span.getBoundingClientRect();
+    document.body.removeChild(span);
+
+    return rect.width;
   },
 
   // inject css into document's head
@@ -191,12 +270,12 @@ Guideline.prototype = {
           color: hsl(0, 0%, 100%);
           font-size: ${this.hintFontSize}px;
           z-index: 9993;
-          pointer-events: none;
         }
 
         .guideline-guide > .guideline-hint {
           display: inline-block;
           padding: 10px;
+          text-shadow: 0 0 20px currentColor;
         }
 
         @keyframes breathe {
@@ -245,6 +324,14 @@ Guideline.prototype = {
         <div class="guideline-mask"></div>
         <div class="guideline-guide">
           <span class="guideline-hint"></span>
+          <svg width="0" height="0" style="position: absolute; left: 0;">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="20" orient="auto" style="fill: currentColor;">
+                <path d="M 0 0 L 10 5 L 0 10 z" />
+              </marker>
+            </defs>
+            <line x1="0" y1="0" x2="100" y2="100" style="stroke:currentColor;stroke-width:2" marker-end="url(#arrow)"/>
+          </svg>
         </div>
       </div>
     `;

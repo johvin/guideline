@@ -50,18 +50,10 @@ Properties:
 - style (string, optional) : custom style for the guideline text.
 
 
-### callback - guideline(configuration, callback) 
+### callback - guideline(configuration, callback)
 
 callback is a function, which will be invoked when the guideline stops.
-
-## CHANGELOG
-
-[`CHANGELOG`](./CHANGELOG.md)
 
 ## License
 
 MIT
-
-## References
-
-- http://ejulianova.github.io/guides/

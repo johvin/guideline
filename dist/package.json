@@ -2,7 +2,7 @@
   "name": "guideline",
   "version": "0.2.0",
   "description": "new features guideline for website to users",
-  "main": "index.js",
+  "main": "guideline.js",
   "scripts": {
     "build": "webpack",
     "release": "npm run build && node build/release.js",

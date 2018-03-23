@@ -11,11 +11,13 @@ module.exports = {
 
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: "[name].js",
-    pathinfo: true
+    filename: "guideline.js",
+    pathinfo: false,
+    libraryTarget: 'commonjs2',
+    library: 'guideline'
   },
 
-  target: 'node',
+  target: 'web',
 
   module: {
     rules: [
