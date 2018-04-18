@@ -237,10 +237,15 @@ Guideline.prototype = {
           animation: breathe 2s ease 1s infinite;
         }
 
+        .body-with-guideline {
+          overflow: hidden;
+          height: 100%;
+        }
+
         .guideline-wrapper,
         .guideline-bg,
         .guideline-mask {
-          position: absolute;
+          position: fixed;
           top: 0;
           left: 0;
           right: 0;
@@ -315,8 +320,10 @@ Guideline.prototype = {
     
     // if there already exists a guideline-wrapper, throw error
     if (document.querySelector('.guideline-wrapper')) {
-      throw new Error('A guideline already exists, it\'s not allowed to run a guideline until another finishes');
+      throw new Error('A guideline already exists, it\'s not allowed to run another guideline until the previous one finishes');
     }
+
+    this.htmlInjected = true;
 
     const html = `
       <div class="guideline-wrapper show">
@@ -337,8 +344,8 @@ Guideline.prototype = {
     `;
 
     document.body.insertAdjacentHTML('beforeend', html);
-
-    this.htmlInjected = true;
+    // 阻止 body 滚动
+    document.body.classList.add('body-with-guideline');
 
     this.guideRootElement = document.querySelector('.guideline-wrapper');
     // bind click listener
@@ -354,6 +361,9 @@ Guideline.prototype = {
     if (!this.htmlInjected) {
       return;
     }
+    this.htmlInjected = false;
+
+    document.body.classList.remove('body-with-guideline');
 
     if (this.guideRootElement) {
       this.guideRootElement.parentNode.removeChild(this.guideRootElement);
@@ -368,8 +378,6 @@ Guideline.prototype = {
     window.removeEventListener('keyup', this.keyUpHandler);
     // unbind window resize listener
     window.removeEventListener('resize', this.resizeWindowHandler);
-    
-    this.htmlInjected = false;
   },
 
   // handle click event to navigate guideline
