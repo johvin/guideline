@@ -6,7 +6,7 @@
 [![License][license]](https://opensource.org/licenses/MIT)
 
 [version]: https://img.shields.io/npm/v/guideline.svg?style=flat-square
-[build]: http://img.shields.io/travis/johvin/guideline/0.2.0_bugfix.svg?style=flat-square
+[build]: http://img.shields.io/travis/johvin/guideline/master.svg?style=flat-square
 [david]: https://img.shields.io/david/johvin/guideline.svg?style=flat-square
 [license]: https://img.shields.io/badge/License-MIT-brightgreen.svg
 
