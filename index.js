@@ -37,15 +37,16 @@ Guideline.prototype = {
 
   // start play the guideline
   play: function play() {
-    const length = this.guideOptions.length;
+    const { length } = this.guideOptions;
+
     if (length > 0 && !this.isGuiding) {
       this.isGuiding = true;
+      this.guideIndex = -1;
+  
+      this.injectCss();
+      this.injectHTML();
+      this.next();
     }
-    this.guideIndex = -1;
-
-    this.injectCss();
-    this.injectHTML();
-    this.next();
   },
 
   // play the previous guide
@@ -61,7 +62,7 @@ Guideline.prototype = {
   // play the next guide
   next: function next() {
     if (!this.isGuiding) return;
-    
+
     const total = this.guideOptions.length;
     const currentIndex = this.guideIndex + 1;
 
@@ -203,8 +204,9 @@ Guideline.prototype = {
   // calculate the layout width of hint text
   calcHintTextWidth: function (fontSize, text) {
     const span = document.createElement('span');
-    span.style.position = 'relative';
+    span.style.position = 'absolute';
     span.style.left = '-10000px';
+    span.style.bottom = 0;
     span.style.display = 'inline-block';
     span.style.visibility = 'hidden';
     span.style.fontSize = fontSize + 'px';
@@ -434,6 +436,7 @@ Guideline.prototype = {
   },
 
   destroy: function destroy() {
+    this.guideOptions = null;
     if (this.guideElement) {
       this.guideElement.classList.remove('guideline-current-element');
       this.guideElement = null;
