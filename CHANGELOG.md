@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.1] - 2018-04-20
+### Fixed
+- fix issue 1 that mask size does not cover the whole page when the page's height is bigger than window.innerHeight
+- forbid scrolling page when guideline is playing
+- fix the bug that the top and bottom edge of the arrow is overflow when it is skew
+- fix the bug that the arrow direction reverses left and right if the guideline text position is on the top of the guided element
+- do not play a guideline if the configuration is empty array
+
+### Changed
+- update changelog
+- update package keywords and description
+- set hint text line-height to 1.25
+
 
 ## [0.2.0] - 2018-03-23
 ### Added

@@ -37,15 +37,16 @@ Guideline.prototype = {
 
   // start play the guideline
   play: function play() {
-    const length = this.guideOptions.length;
+    const { length } = this.guideOptions;
+
     if (length > 0 && !this.isGuiding) {
       this.isGuiding = true;
+      this.guideIndex = -1;
+  
+      this.injectCss();
+      this.injectHTML();
+      this.next();
     }
-    this.guideIndex = -1;
-
-    this.injectCss();
-    this.injectHTML();
-    this.next();
   },
 
   // play the previous guide
@@ -61,7 +62,7 @@ Guideline.prototype = {
   // play the next guide
   next: function next() {
     if (!this.isGuiding) return;
-    
+
     const total = this.guideOptions.length;
     const currentIndex = this.guideIndex + 1;
 
@@ -157,29 +158,29 @@ Guideline.prototype = {
       const hintLeft = Math.floor(hintXCenter - hintWidth / 2);
       // svg line coordinate
       const linePos = {};
-      const svgHeight = 50;
+      const svgInnerHeight = 50;
+      const svgPaddingVertical = 10; // padding: 10px 0;
+      const svgOuterHeight = svgInnerHeight + svgPaddingVertical * 2;
       
+      linePos.x1 = hintWidth >> 1;
+      linePos.x2 = elemXCenter - hintLeft;
       if (isBottom) {
-        linePos.x1 = hintWidth >> 1;
-        linePos.y1 = svgHeight;
-        linePos.x2 = elemXCenter - hintLeft;
+        linePos.y1 = svgInnerHeight;
         linePos.y2 = 0;
       } else {
-        linePos.x1 = elemXCenter - hintLeft;
         linePos.y1 = 0;
-        linePos.x2 = hintWidth >> 1;
-        linePos.y2 = svgHeight;
+        linePos.y2 = svgInnerHeight;
       }
 
-      const verticalPosition = isBottom ? `top: ${bottom + 20}px` : `bottom: ${window.innerHeight - top + 20}px`;
-      const paddingVertical = `padding-${isBottom ? 'top' : 'bottom'}: ${svgHeight}px`;
+      const verticalPosition = isBottom ? `top: ${bottom + 10}px` : `bottom: ${window.innerHeight - top + 10}px`;
+      const paddingVertical = `padding-${isBottom ? 'top' : 'bottom'}: ${svgOuterHeight}px`;
       this.guideHintRootElement.style.cssText = `${paddingVertical}; left: ${hintLeft}px; width: ${hintWidth}px; ${verticalPosition};`;
 
       // svg setting
       const svg = this.guideHintRootElement.querySelector('svg');
       const line = svg.querySelector('line');
       svg.setAttribute('width', hintWidth);
-      svg.setAttribute('height', svgHeight);
+      svg.setAttribute('height', svgOuterHeight);
       
       if (isBottom) {
         svg.style.top = 0;
@@ -203,6 +204,9 @@ Guideline.prototype = {
   // calculate the layout width of hint text
   calcHintTextWidth: function (fontSize, text) {
     const span = document.createElement('span');
+    span.style.position = 'absolute';
+    span.style.left = '-10000px';
+    span.style.bottom = 0;
     span.style.display = 'inline-block';
     span.style.visibility = 'hidden';
     span.style.fontSize = fontSize + 'px';
@@ -237,10 +241,15 @@ Guideline.prototype = {
           animation: breathe 2s ease 1s infinite;
         }
 
+        .body-with-guideline {
+          overflow: hidden;
+          height: 100%;
+        }
+
         .guideline-wrapper,
         .guideline-bg,
         .guideline-mask {
-          position: absolute;
+          position: fixed;
           top: 0;
           left: 0;
           right: 0;
@@ -275,6 +284,7 @@ Guideline.prototype = {
         .guideline-guide > .guideline-hint {
           display: inline-block;
           padding: 10px;
+          line-height: 1.25;
           text-shadow: 0 0 20px currentColor;
         }
 
@@ -315,8 +325,10 @@ Guideline.prototype = {
     
     // if there already exists a guideline-wrapper, throw error
     if (document.querySelector('.guideline-wrapper')) {
-      throw new Error('A guideline already exists, it\'s not allowed to run a guideline until another finishes');
+      throw new Error('A guideline already exists, it\'s not allowed to run another guideline until the previous one finishes');
     }
+
+    this.htmlInjected = true;
 
     const html = `
       <div class="guideline-wrapper show">
@@ -324,10 +336,10 @@ Guideline.prototype = {
         <div class="guideline-mask"></div>
         <div class="guideline-guide">
           <span class="guideline-hint"></span>
-          <svg width="0" height="0" style="position: absolute; left: 0;">
+          <svg width="0" height="0" style="padding: 10px 0; position: absolute; left: 0; box-sizing: border-box;">
             <defs>
-              <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="20" orient="auto" style="fill: currentColor;">
-                <path d="M 0 0 L 10 5 L 0 10 z" />
+              <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="6" markerHeight="20" orient="auto" style="fill: currentColor;">
+                <path d="M 0 0 L 12 6 L 0 12 z" />
               </marker>
             </defs>
             <line x1="0" y1="0" x2="100" y2="100" style="stroke:currentColor;stroke-width:2" marker-end="url(#arrow)"/>
@@ -337,8 +349,8 @@ Guideline.prototype = {
     `;
 
     document.body.insertAdjacentHTML('beforeend', html);
-
-    this.htmlInjected = true;
+    // 阻止 body 滚动
+    document.body.classList.add('body-with-guideline');
 
     this.guideRootElement = document.querySelector('.guideline-wrapper');
     // bind click listener
@@ -354,6 +366,9 @@ Guideline.prototype = {
     if (!this.htmlInjected) {
       return;
     }
+    this.htmlInjected = false;
+
+    document.body.classList.remove('body-with-guideline');
 
     if (this.guideRootElement) {
       this.guideRootElement.parentNode.removeChild(this.guideRootElement);
@@ -368,8 +383,6 @@ Guideline.prototype = {
     window.removeEventListener('keyup', this.keyUpHandler);
     // unbind window resize listener
     window.removeEventListener('resize', this.resizeWindowHandler);
-    
-    this.htmlInjected = false;
   },
 
   // handle click event to navigate guideline
@@ -423,6 +436,7 @@ Guideline.prototype = {
   },
 
   destroy: function destroy() {
+    this.guideOptions = null;
     if (this.guideElement) {
       this.guideElement.classList.remove('guideline-current-element');
       this.guideElement = null;

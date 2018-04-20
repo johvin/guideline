@@ -1,7 +1,7 @@
 {
   "name": "guideline",
-  "version": "0.2.0",
-  "description": "new features guideline for website to users",
+  "version": "0.2.1",
+  "description": "A simple guideline tool based on which you can quickly implement new features guidelines for website users.",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
@@ -15,7 +15,11 @@
   "keywords": [
     "guide",
     "guideline",
-    "new feature"
+    "feature guideline",
+    "product guideline",
+    "new feature",
+    "UI",
+    "web"
   ],
   "author": "johvin",
   "license": "MIT",
