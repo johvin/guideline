@@ -1,6 +1,6 @@
 {
   "name": "guideline",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A simple guideline tool based on which you can quickly implement new features guidelines for website users.",
   "main": "index.js",
   "scripts": {
