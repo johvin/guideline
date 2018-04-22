@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+- hasNext api can tell if there is a follow-up hint
+
+### Changed
+- callback function accepts two parameters, `total` and `playLength`, which represent the total amount of valid hints and the actually played amount of hints
+
+
 ## [0.2.1] - 2018-04-20
 ### Fixed
 - fix issue 1 that mask size does not cover the whole page when the page's height is bigger than window.innerHeight

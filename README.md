@@ -3,12 +3,14 @@
 [![Version npm][version]](https://www.npmjs.com/package/guideline?activeTab=versions)
 [![Build Status][build]](https://travis-ci.org/johvin/guideline)
 [![Dependencies][david]](https://david-dm.org/johvin/guideline)
+[![Known Vulnerabilities][vulnerabilities]](https://snyk.io/test/npm/guideline)
 [![License][license]](https://opensource.org/licenses/MIT)
 
 [version]: https://img.shields.io/npm/v/guideline.svg?style=flat-square
 [build]: http://img.shields.io/travis/johvin/guideline/master.svg?style=flat-square
 [david]: https://img.shields.io/david/johvin/guideline.svg?style=flat-square
-[license]: https://img.shields.io/badge/License-MIT-brightgreen.svg
+[vulnerabilities]: https://snyk.io/test/npm/guideline/badge.svg?style=flat-square
+[license]: https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square
 
 > This is a simple guideline tool based on which you can quickly implement new features guidelines for website users.
 
@@ -16,7 +18,7 @@
 
 There are two ways to play a guideline, a simple way and an advanced way. The simple way is an encapsulation of the advanced way which can do more setting and control the playing of guideline.
 
-*Guideline supports using keyboard shortcuts to control playback. See the related API section for details*
+*Guideline also supports using keyboard shortcuts to control playback. See the relevant part of API for details*
 
 ### Simple way
 
@@ -77,9 +79,14 @@ gl.hintFontSize = 20
 // start the guideline
 gl.play();
 
-// autoplay the next hint after 3 seconds
-setTimeout(function () {
-  gl.next();
+// autoplay the next hint every 3 seconds
+const timer = setInterval(function () {
+  if (gl.hasNext()) {
+    gl.next();
+  } else {
+    clearInterval(timer);
+    gl.stop();
+  }
 }, 3000);
 ```
 
@@ -105,10 +112,9 @@ Properties:
 - position (string, optional, defaults to 'bottom') : used to set the location of the guideline text relative to the guided element. enumerated type，value is `'top'` or `'bottom'`.
 - style (string, optional) : custom style for the guideline text.
 
+### callback(total, playLength) - guideline(configuration, callback)
 
-### callback - guideline(configuration, callback)
-
-`callback` is a function, which will be invoked when the guideline stops.
+`callback` is a function, which will be invoked when the guideline stops. `callback` accepts two parameters `total` and `playLength`.
 
 ### Guideline instance properties
 
@@ -120,6 +126,7 @@ Properties:
 - play : start the guideline after doing some settings
 - prev : play the previous hint
 - next : play the next hint, if there's no more hint, stop the guideline and exit
+- hasNext : tell if there is a follow-up hint
 - stop : stop playing the guideline
 
 ### Keyboard shortcuts
