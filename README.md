@@ -25,7 +25,7 @@ There are two ways to play a guideline, a simple way and an advanced way. The si
 ```js
 const guideline = require('guideline');
 
-const visitTimes = parseint(localstorage.getItem('visitTimes')) || 0;
+const visitTimes = parseInt(localStorage.getItem('visitTimes')) || 0;
 
 if (visitTimes === 0) {
   const guideOptions = [{
@@ -67,8 +67,8 @@ const guideOptions = [{
   position: 'bottom'
 }];
 
-const gl = new guideline.Guideline(guideOptions, function () {
-  console.log('guideline is over');
+const gl = new guideline.Guideline(guideOptions, function (total, played) {
+  console.log('guideline is over, total valid ', total, 'played ', played);
 });
 
 // set hint text maximum width
@@ -112,9 +112,9 @@ Properties:
 - position (string, optional, defaults to 'bottom') : used to set the location of the guideline text relative to the guided element. enumerated type，value is `'top'` or `'bottom'`.
 - style (string, optional) : custom style for the guideline text.
 
-### callback(total, playLength) - guideline(configuration, callback)
+### callback(total, playedAmount) - guideline(configuration, callback)
 
-`callback` is a function, which will be invoked when the guideline stops. `callback` accepts two parameters `total` and `playLength`.
+`callback` is a function, which will be invoked when the guideline stops. `callback` takes two parameters `total` and `playedAmount`, representing the total amount of valid guidelines and the actual playback amount of guidelines.
 
 ### Guideline instance properties
 
