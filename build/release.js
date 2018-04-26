@@ -10,12 +10,15 @@ adjustMD({
   ]
 });
 
+makePkg();
+
+fs.writeFileSync('dist/guideline.js', fs.readFileSync('index.js'));
+
 function makePkg() {
   const pkg = require('../package.json');
   pkg.main = 'guideline.js';
   fs.writeFileSync(`dist/package.json`, JSON.stringify(pkg, null, 2));
 }
 
-makePkg();
 
 console.log('\n\npackage.json and README are both ready !!!');
