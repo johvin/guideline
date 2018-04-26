@@ -1,7 +1,465 @@
-/*!
- * guideline.js v1.0.0
- * 
- * Author: johvin
- * Date: 2018-04-25T09:17:08.958Z
- */
-module.exports=function(e){function t(n){if(i[n])return i[n].exports;var o=i[n]={i:n,l:!1,exports:{}};return e[n].call(o.exports,o,o.exports,t),o.l=!0,o.exports}var i={};return t.m=e,t.c=i,t.i=function(e){return e},t.d=function(e,i,n){t.o(e,i)||Object.defineProperty(e,i,{configurable:!1,enumerable:!0,get:n})},t.n=function(e){var i=e&&e.__esModule?function(){return e.default}:function(){return e};return t.d(i,"a",i),i},t.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},t.p="",t(t.s=0)}([function(e,t){function i(e){return"[object Array]"===Object.prototype.toString.call(e)}function n(e,t){this.hintFontSize=24,this.hintTextMaxWidth=400,this.guideOptions=i(e)?e.filter(function(e){return"object"===(void 0===e?"undefined":s(e))&&"string"==typeof e.content&&e.content.trim().length>0}):[],this.callback=t,this.guideElement=null,this.cssInjected=!1,this.htmlInjected=!1,this.isGuiding=!1,this.guideIndex=-1,this.resizeWindowHandler=this.adjustGuideHintRootElementPosition.bind(this),this.clickHandler=this.clickHandler.bind(this),this.keyUpHandler=this.keyboardHandler.bind(this)}function o(e,t){new n(e,t).play()}var s="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},d=!1;try{var l=Object.defineProperty({},"passive",{get:function(){d=!0}});window.addEventListener("test",null,l)}catch(e){}n.prototype={constructor:n,play:function(){this.guideOptions.length>0&&!this.isGuiding&&(this.isGuiding=!0,this.guideIndex=-1,this.injectCss(),this.injectHTML(),this.next())},prev:function(){if(this.isGuiding){var e=this.guideIndex-1;e>=0&&this.show(e)}},next:function(){this.hasNext()?this.show(this.guideIndex+1):this.isGuiding&&this.stop()},hasNext:function(){if(!this.isGuiding)return!1;var e=this.guideOptions.length,t=this.guideIndex+1;return t>=0&&t<e},show:function(e){var t=this.currentHintOption=this.guideOptions[e];this.guideElement&&this.guideElement.classList.remove("guideline-current-element"),this.guideElement=t.element,this.guideElement&&this.guideElement.classList.add("guideline-current-element"),this.guideRelativePosition=t.position,"bottom"!==this.guideRelativePosition&&"top"!==this.guideRelativePosition&&(this.guideRelativePosition="bottom"),this.guideHintRootElement||(this.guideHintRootElement=this.guideRootElement.querySelector(".guideline-guide")),this.adjustGuideHintRootElementPosition();var i=this.guideHintRootElement.firstElementChild;i&&(i.textContent=t.content,i.style.cssText="style"in t?t.style:""),this.guideIndex=e},adjustGuideHintRootElementPosition:function(){if(this.guideElement){var e="bottom"===this.guideRelativePosition;this.guideElement.scrollIntoViewIfNeeded?this.guideElement.scrollIntoViewIfNeeded():this.guideElement.scrollIntoView(e);var t=this.guideElement.getBoundingClientRect(),i=t.left,n=t.right,o=t.top,s=t.bottom,d=window.innerWidth,l=this.calcHintTextWidth(this.hintFontSize,this.currentHintOption.content)+20;l=Math.ceil(l),l>this.hintTextMaxWidth&&(l=this.hintTextMaxWidth);var r=i+n>>1,u=r;u+l/2>d&&(u=Math.floor(d-l/2)),u-l/2<0&&(u=Math.ceil(l/2));var h=Math.floor(u-l/2),a={};a.x1=l>>1,a.x2=r-h,e?(a.y1=50,a.y2=0):(a.y1=0,a.y2=50);var c=e?"top: "+(s+10)+"px":"bottom: "+(window.innerHeight-o+10)+"px",g="padding-"+(e?"top":"bottom")+": 70px";this.guideHintRootElement.style.cssText=g+"; left: "+h+"px; width: "+l+"px; "+c+";";var p=this.guideHintRootElement.querySelector("svg"),m=p.querySelector("line");p.setAttribute("width",l),p.setAttribute("height",70),e?(p.style.top=0,p.style.bottom="auto"):(p.style.top="auto",p.style.bottom=0),Object.keys(a).forEach(function(e){m.setAttribute(e,a[e])})}else{this.guideHintRootElement.style.cssText="left: 50%; top: 50%; transform: translate(-50%, -50%);";var y=this.guideHintRootElement.querySelector("svg");y.setAttribute("width",0),y.setAttribute("height",0)}},calcHintTextWidth:function(e,t){var i=document.createElement("span");i.style.position="absolute",i.style.left="-10000px",i.style.bottom=0,i.style.display="inline-block",i.style.visibility="hidden",i.style.fontSize=e+"px",i.innerText=t,document.body.appendChild(i);var n=i.getBoundingClientRect();return document.body.removeChild(i),n.width},injectCss:function(){if(!this.cssInjected){var e="guideline-css-style",t=document.getElementById(e);if(!t){t=document.createElement("style"),t.setAttribute("type","text/css"),t.id=e;var i="\n        .guideline-current-element {\n          position: relative;\n          z-index: 9991;\n          box-shadow: 0 0 4px 4px rgba(255, 0, 0, 0.8);\n          animation: breathe 2s ease 1s infinite;\n        }\n\n        .body-with-guideline {\n          overflow: hidden;\n          height: 100%;\n        }\n\n        .guideline-wrapper,\n        .guideline-bg,\n        .guideline-mask {\n          position: fixed;\n          top: 0;\n          left: 0;\n          right: 0;\n          bottom: 0;\n        }\n\n        .guideline-wrapper {\n          transition: opacity 0.5s ease;\n          opacity: 0;\n        }\n\n        .guideline-wrapper.show {\n          opacity: 1;\n        }\n\n        .guideline-bg {\n          background: hsla(0, 0%, 0%, 0.6);\n          z-index: 9990;\n        }\n\n        .guideline-mask {\n          z-index: 9992;\n        }\n\n        .guideline-guide {\n          position: absolute;\n          color: hsl(0, 0%, 100%);\n          font-size: "+this.hintFontSize+"px;\n          z-index: 9993;\n        }\n\n        .guideline-guide > .guideline-hint {\n          display: inline-block;\n          padding: 10px;\n          line-height: 1.25;\n          text-shadow: 0 0 20px currentColor;\n        }\n\n        @keyframes breathe {\n          from {\n            box-shadow: 0 0 4px 4px rgba(255, 0, 0, 0.8);\n          }\n          50% {\n            box-shadow: 0 0 2px 1px rgba(255, 0, 0, 0.6);\n          }\n          to {\n            box-shadow: 0 0 4px 4px rgba(255, 0, 0, 0.8);\n          }\n        }\n      ";t.textContent=i,document.head.appendChild(t)}this.cssInjected=!0}},unloadCss:function(){if(this.cssInjected){var e=document.getElementById("guideline-css-style");e.parentNode.removeChild(e)}},injectHTML:function(){if(!this.htmlInjected){if(document.querySelector(".guideline-wrapper"))throw new Error("A guideline already exists, it's not allowed to run another guideline until the previous one finishes");this.htmlInjected=!0;document.body.insertAdjacentHTML("beforeend",'\n      <div class="guideline-wrapper show">\n        <div class="guideline-bg"></div>\n        <div class="guideline-mask"></div>\n        <div class="guideline-guide">\n          <span class="guideline-hint"></span>\n          <svg width="0" height="0" style="padding: 10px 0; position: absolute; left: 0; box-sizing: border-box;">\n            <defs>\n              <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="6" markerHeight="20" orient="auto" style="fill: currentColor;">\n                <path d="M 0 0 L 12 6 L 0 12 z" />\n              </marker>\n            </defs>\n            <line x1="0" y1="0" x2="100" y2="100" style="stroke:currentColor;stroke-width:2" marker-end="url(#arrow)"/>\n          </svg>\n        </div>\n      </div>\n    '),document.body.classList.add("body-with-guideline"),this.guideRootElement=document.querySelector(".guideline-wrapper"),this.guideRootElement.addEventListener("click",this.clickHandler,!!d&&{passive:!0}),window.addEventListener("keyup",this.keyUpHandler,!0),window.addEventListener("resize",this.resizeWindowHandler,!!d&&{passive:!0})}},unloadHTML:function(){this.htmlInjected&&(this.htmlInjected=!1,document.body.classList.remove("body-with-guideline"),this.guideRootElement&&(this.guideRootElement.parentNode.removeChild(this.guideRootElement),this.guideRootElement=null),window.removeEventListener("keyup",this.keyUpHandler),window.removeEventListener("resize",this.resizeWindowHandler))},clickHandler:function(e){e.stopPropagation(),this.next()},keyboardHandler:function(e){if(!(e.ctrlKey||e.altKey||e.shiftKey||e.metaKey))switch(e.keyCode||e.which){case 39:case 13:case 32:this.next();break;case 37:case 8:this.prev();break;case 27:this.stop()}},stop:function(){if(this.isGuiding){this.isGuiding=!1;var e=this.guideOptions.length,t=this.guideIndex+1;this.guideIndex=-1,this.destroy(),this.callback&&"function"==typeof this.callback&&this.callback(e,t)}},destroy:function(){this.guideOptions=null,this.guideElement&&(this.guideElement.classList.remove("guideline-current-element"),this.guideElement=null),this.unloadHTML(),this.unloadCss()}},o.Guideline=n,e.exports=o}]);
+// judge if the browser event support passive mode
+let passiveSupported = false;
+
+try {
+  const options = Object.defineProperty({}, 'passive', {
+    get: function () {
+      passiveSupported = true;
+    }
+  });
+  window.addEventListener('test', null, options);
+} catch (e) {}
+
+function isArray(arr) {
+  return Object.prototype.toString.call(arr) === '[object Array]';
+}
+
+function Guideline(guideOptions, callback) {
+  // hint text font-size setting
+  this.hintFontSize = 24;
+  this.hintTextMaxWidth = 400;
+  this.guideOptions = isArray(guideOptions)
+    ? guideOptions.filter(it => typeof it === 'object' && typeof it.content === 'string' && it.content.trim().length > 0)
+    : [];
+  this.callback = callback;
+  this.guideElement = null;
+  this.cssInjected = false;
+  this.htmlInjected = false;
+  this.isGuiding = false;
+  this.guideIndex = -1;
+  this.resizeWindowHandler = this.adjustGuideHintRootElementPosition.bind(this);
+  this.clickHandler = this.clickHandler.bind(this);
+  this.keyUpHandler = this.keyboardHandler.bind(this);
+}
+
+Guideline.prototype = {
+  constructor: Guideline,
+
+  // start play the guideline
+  play: function play() {
+    const { length } = this.guideOptions;
+
+    if (length > 0 && !this.isGuiding) {
+      this.isGuiding = true;
+      this.guideIndex = -1;
+
+      this.injectCss();
+      this.injectHTML();
+      this.next();
+    }
+  },
+
+  // play the previous guide
+  prev: function prev() {
+    if (!this.isGuiding) return;
+    const currentIndex = this.guideIndex - 1;
+
+    if (currentIndex >= 0) {
+      this.show(currentIndex);
+    }
+  },
+
+  // play the next guide
+  next: function next() {
+    if (this.hasNext()) {
+      this.show(this.guideIndex + 1);
+    } else if (this.isGuiding) {
+      this.stop();
+    }
+  },
+
+  // tell if there is a follow-up
+  hasNext: function hasNext() {
+    if (!this.isGuiding) return false;
+
+    const total = this.guideOptions.length;
+    const nextIndex = this.guideIndex + 1;
+
+    return nextIndex >= 0 && nextIndex < total;
+  },
+
+  // show specific guide
+  show: function (guideIndex) {
+    const curHintOpt = this.currentHintOption = this.guideOptions[guideIndex];
+
+    if (this.guideElement) {
+      this.guideElement.classList.remove('guideline-current-element');
+    }
+    this.guideElement = curHintOpt.element;
+    if (this.guideElement) {
+      this.guideElement.classList.add('guideline-current-element');
+    }
+
+    // guide hint root element's relative position of current guide element
+    this.guideRelativePosition = curHintOpt.position;
+    if (this.guideRelativePosition !== 'bottom' && this.guideRelativePosition !== 'top') {
+      this.guideRelativePosition = 'bottom';
+    }
+
+    if (!this.guideHintRootElement) {
+      this.guideHintRootElement = this.guideRootElement.querySelector('.guideline-guide');
+    }
+
+    this.adjustGuideHintRootElementPosition();
+
+    // update hint content and style
+    const hintElem = this.guideHintRootElement.firstElementChild;
+    if (hintElem) {
+      hintElem.textContent = curHintOpt.content;
+      hintElem.style.cssText = 'style' in curHintOpt ? curHintOpt.style : '';
+    }
+
+    this.guideIndex = guideIndex;
+  },
+
+  // adjust guide content root element's position
+  // according to current guide element's position
+  adjustGuideHintRootElementPosition: function () {
+    if (this.guideElement) {
+
+      // hint is at the bottom of the guide element
+      const isBottom = this.guideRelativePosition === 'bottom';
+
+      // Making guideElement scroll into view before invoking getBoundingClientRect
+      // can cover the case that the guideElement's parent or grandfather has a fixed position which leads to
+      // guideline's height equals to window.innerHeight, in the meanwhile the guideElement's computed top is greater than window.innerHeight
+      // in which case the guide hint element will be outside of the screen.
+      if (this.guideElement.scrollIntoViewIfNeeded) {
+        this.guideElement.scrollIntoViewIfNeeded();
+      } else {
+        // note: some browser do not support scrollIntoViewIfNeeded() now.
+        this.guideElement.scrollIntoView(isBottom);
+      }
+      const {
+        left,
+        right,
+        top,
+        bottom
+      } = this.guideElement.getBoundingClientRect();
+
+      const winWidth = window.innerWidth;
+      // hint text padding
+      const textPadding = 10;
+      let hintWidth = this.calcHintTextWidth(this.hintFontSize, this.currentHintOption.content) + textPadding * 2;
+
+      hintWidth = Math.ceil(hintWidth);
+      if (hintWidth > this.hintTextMaxWidth) {
+        hintWidth = this.hintTextMaxWidth;
+      }
+
+      // guide element x center
+      const elemXCenter = (left + right) >> 1;
+      // calc hint text x center 
+      let hintXCenter = elemXCenter;
+      if (hintXCenter + hintWidth / 2 > winWidth) {
+        hintXCenter = Math.floor(winWidth - hintWidth / 2);
+      }
+
+      if (hintXCenter - hintWidth / 2 < 0) {
+        hintXCenter = Math.ceil(hintWidth / 2);
+      }
+
+      // hint root element left coordinatee
+      const hintLeft = Math.floor(hintXCenter - hintWidth / 2);
+      // svg line coordinate
+      const linePos = {};
+      const svgInnerHeight = 50;
+      const svgPaddingVertical = 10; // padding: 10px 0;
+      const svgOuterHeight = svgInnerHeight + svgPaddingVertical * 2;
+
+      linePos.x1 = hintWidth >> 1;
+      linePos.x2 = elemXCenter - hintLeft;
+      if (isBottom) {
+        linePos.y1 = svgInnerHeight;
+        linePos.y2 = 0;
+      } else {
+        linePos.y1 = 0;
+        linePos.y2 = svgInnerHeight;
+      }
+
+      const verticalPosition = isBottom ? `top: ${bottom + 10}px` : `bottom: ${window.innerHeight - top + 10}px`;
+      const paddingVertical = `padding-${isBottom ? 'top' : 'bottom'}: ${svgOuterHeight}px`;
+      this.guideHintRootElement.style.cssText = `${paddingVertical}; left: ${hintLeft}px; width: ${hintWidth}px; ${verticalPosition};`;
+
+      // svg setting
+      const svg = this.guideHintRootElement.querySelector('svg');
+      const line = svg.querySelector('line');
+      svg.setAttribute('width', hintWidth);
+      svg.setAttribute('height', svgOuterHeight);
+
+      if (isBottom) {
+        svg.style.top = 0;
+        svg.style.bottom = 'auto';
+      } else {
+        svg.style.top = 'auto';
+        svg.style.bottom = 0;
+      }
+
+      Object.keys(linePos).forEach((attr) => {
+        line.setAttribute(attr, linePos[attr]);
+      });
+    } else {
+      this.guideHintRootElement.style.cssText = `left: 50%; top: 50%; transform: translate(-50%, -50%);`;
+      const svg = this.guideHintRootElement.querySelector('svg');
+      svg.setAttribute('width', 0);
+      svg.setAttribute('height', 0);
+    }
+  },
+
+  // calculate the layout width of hint text
+  calcHintTextWidth: function (fontSize, text) {
+    const span = document.createElement('span');
+    span.style.position = 'absolute';
+    span.style.left = '-10000px';
+    span.style.bottom = 0;
+    span.style.display = 'inline-block';
+    span.style.visibility = 'hidden';
+    span.style.fontSize = fontSize + 'px';
+    span.innerText = text;
+
+    document.body.appendChild(span);
+    const rect = span.getBoundingClientRect();
+    document.body.removeChild(span);
+
+    return rect.width;
+  },
+
+  // inject css into document's head
+  injectCss: function injectCss() {
+    if (this.cssInjected) {
+      return;
+    }
+
+    const cssId = 'guideline-css-style';
+    let elem = document.getElementById(cssId);
+
+    if (!elem) {
+      elem = document.createElement('style');
+      elem.setAttribute('type', 'text/css');
+      elem.id = cssId;
+
+      const cssText = `
+        .guideline-current-element {
+          position: relative;
+          z-index: 9991;
+          box-shadow: 0 0 4px 4px rgba(255, 0, 0, 0.8);
+          animation: breathe 2s ease 1s infinite;
+        }
+
+        .body-with-guideline {
+          overflow: hidden;
+          height: 100%;
+        }
+
+        .guideline-wrapper,
+        .guideline-bg,
+        .guideline-mask {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+        }
+
+        .guideline-wrapper {
+          transition: opacity 0.5s ease;
+          opacity: 0;
+        }
+
+        .guideline-wrapper.show {
+          opacity: 1;
+        }
+
+        .guideline-bg {
+          background: hsla(0, 0%, 0%, 0.6);
+          z-index: 9990;
+        }
+
+        .guideline-mask {
+          z-index: 9992;
+        }
+
+        .guideline-guide {
+          position: absolute;
+          color: hsl(0, 0%, 100%);
+          font-size: ${this.hintFontSize}px;
+          z-index: 9993;
+        }
+
+        .guideline-guide > .guideline-hint {
+          display: inline-block;
+          padding: 10px;
+          line-height: 1.25;
+          text-shadow: 0 0 20px currentColor;
+        }
+
+        @keyframes breathe {
+          from {
+            box-shadow: 0 0 4px 4px rgba(255, 0, 0, 0.8);
+          }
+          50% {
+            box-shadow: 0 0 2px 1px rgba(255, 0, 0, 0.6);
+          }
+          to {
+            box-shadow: 0 0 4px 4px rgba(255, 0, 0, 0.8);
+          }
+        }
+      `;
+
+      // ie8 及之前版本不支持，可使用 cssText 兼容
+      elem.textContent = cssText;
+      document.head.appendChild(elem);
+    }
+
+    this.cssInjected = true;
+  },
+
+  // remove css from document's head
+  unloadCss: function unloadCss() {
+    if (this.cssInjected) {
+      const css = document.getElementById('guideline-css-style');
+      css.parentNode.removeChild(css);
+    }
+  },
+
+  // inject guide html fragment into document's body
+  injectHTML: function injectHTML() {
+    if (this.htmlInjected) {
+      return;
+    }
+
+    // if there already exists a guideline-wrapper, throw error
+    if (document.querySelector('.guideline-wrapper')) {
+      throw new Error('A guideline already exists, it\'s not allowed to run another guideline until the previous one finishes');
+    }
+
+    this.htmlInjected = true;
+
+    const html = `
+      <div class="guideline-wrapper show">
+        <div class="guideline-bg"></div>
+        <div class="guideline-mask"></div>
+        <div class="guideline-guide">
+          <span class="guideline-hint"></span>
+          <svg width="0" height="0" style="padding: 10px 0; position: absolute; left: 0; box-sizing: border-box;">
+            <defs>
+              <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="6" markerHeight="20" orient="auto" style="fill: currentColor;">
+                <path d="M 0 0 L 12 6 L 0 12 z" />
+              </marker>
+            </defs>
+            <line x1="0" y1="0" x2="100" y2="100" style="stroke:currentColor;stroke-width:2" marker-end="url(#arrow)"/>
+          </svg>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+    // 阻止 body 滚动
+    document.body.classList.add('body-with-guideline');
+
+    this.guideRootElement = document.querySelector('.guideline-wrapper');
+    // bind click listener
+    this.guideRootElement.addEventListener('click', this.clickHandler, passiveSupported ? { passive: true } : false);
+    // bind keyboard event listener
+    window.addEventListener('keyup', this.keyUpHandler, true);
+    // listen window resize event
+    window.addEventListener('resize', this.resizeWindowHandler, passiveSupported ? { passive: true } : false);
+  },
+
+  // remove guide html fragment from document's body
+  unloadHTML: function unloadHTML() {
+    if (!this.htmlInjected) {
+      return;
+    }
+    this.htmlInjected = false;
+
+    document.body.classList.remove('body-with-guideline');
+
+    if (this.guideRootElement) {
+      this.guideRootElement.parentNode.removeChild(this.guideRootElement);
+      this.guideRootElement = null;
+    }
+
+    // removeEventListener or detachEvent
+    // http://www.runoob.com/jsref/met-element-removeeventlistener.html
+    // useCapture 是否必须分情况而定
+    //
+    // bind keyboard event listener
+    window.removeEventListener('keyup', this.keyUpHandler);
+    // unbind window resize listener
+    window.removeEventListener('resize', this.resizeWindowHandler);
+  },
+
+  // handle click event to navigate guideline
+  clickHandler: function clickHandler(e) {
+    e.stopPropagation();
+    this.next();
+  },
+
+  // handle keyboard event
+  keyboardHandler: function keyboardHandler(e) {
+    if (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey) {
+      // 组合键，不是要控制功能指引的前进后退
+      return;
+    }
+
+    switch (e.keyCode || e.which) {
+      // arrow right
+      case 39:
+      // enter
+      case 13:
+      // space
+      case 32:
+        this.next();
+        break;
+      // arrow left
+      case 37:
+      // backspace
+      case 8:
+        this.prev();
+        break;
+      // esc
+      case 27:
+        this.stop();
+        break;
+      default:
+    }
+  },
+
+  // stop play the guideline
+  stop: function stop() {
+    if (this.isGuiding) {
+      this.isGuiding = false;
+
+      const total = this.guideOptions.length;
+      const playLength = this.guideIndex + 1;
+      this.guideIndex = -1;
+
+      this.destroy();
+
+      if (this.callback && typeof this.callback === 'function') {
+        this.callback(total, playLength);
+      }
+    }
+  },
+
+  destroy: function destroy() {
+    this.guideOptions = null;
+    if (this.guideElement) {
+      this.guideElement.classList.remove('guideline-current-element');
+      this.guideElement = null;
+    }
+
+    this.unloadHTML();
+    this.unloadCss();
+  }
+};
+
+function guide(guideOptions, callback) {
+  const gl = new Guideline(guideOptions, callback);
+  gl.play();
+};
+
+guide.Guideline = Guideline;
+
+module.exports = guide;
