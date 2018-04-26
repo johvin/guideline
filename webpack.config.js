@@ -11,7 +11,7 @@ module.exports = {
 
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: "guideline.js",
+    filename: "guideline.min.js",
     pathinfo: false,
     libraryTarget: 'commonjs2',
     library: 'guideline'

@@ -42,7 +42,7 @@ Guideline.prototype = {
     if (length > 0 && !this.isGuiding) {
       this.isGuiding = true;
       this.guideIndex = -1;
-  
+
       this.injectCss();
       this.injectHTML();
       this.next();
@@ -61,16 +61,21 @@ Guideline.prototype = {
 
   // play the next guide
   next: function next() {
-    if (!this.isGuiding) return;
+    if (this.hasNext()) {
+      this.show(this.guideIndex + 1);
+    } else if (this.isGuiding) {
+      this.stop();
+    }
+  },
+
+  // tell if there is a follow-up
+  hasNext: function hasNext() {
+    if (!this.isGuiding) return false;
 
     const total = this.guideOptions.length;
-    const currentIndex = this.guideIndex + 1;
+    const nextIndex = this.guideIndex + 1;
 
-    if (total === 0 || currentIndex >= total) {
-      return this.stop();
-    }
-
-    this.show(currentIndex);
+    return nextIndex >= 0 && nextIndex < total;
   },
 
   // show specific guide
@@ -136,7 +141,7 @@ Guideline.prototype = {
       // hint text padding
       const textPadding = 10;
       let hintWidth = this.calcHintTextWidth(this.hintFontSize, this.currentHintOption.content) + textPadding * 2;
-      
+
       hintWidth = Math.ceil(hintWidth);
       if (hintWidth > this.hintTextMaxWidth) {
         hintWidth = this.hintTextMaxWidth;
@@ -161,7 +166,7 @@ Guideline.prototype = {
       const svgInnerHeight = 50;
       const svgPaddingVertical = 10; // padding: 10px 0;
       const svgOuterHeight = svgInnerHeight + svgPaddingVertical * 2;
-      
+
       linePos.x1 = hintWidth >> 1;
       linePos.x2 = elemXCenter - hintLeft;
       if (isBottom) {
@@ -181,7 +186,7 @@ Guideline.prototype = {
       const line = svg.querySelector('line');
       svg.setAttribute('width', hintWidth);
       svg.setAttribute('height', svgOuterHeight);
-      
+
       if (isBottom) {
         svg.style.top = 0;
         svg.style.bottom = 'auto';
@@ -211,7 +216,7 @@ Guideline.prototype = {
     span.style.visibility = 'hidden';
     span.style.fontSize = fontSize + 'px';
     span.innerText = text;
-    
+
     document.body.appendChild(span);
     const rect = span.getBoundingClientRect();
     document.body.removeChild(span);
@@ -224,7 +229,7 @@ Guideline.prototype = {
     if (this.cssInjected) {
       return;
     }
-    
+
     const cssId = 'guideline-css-style';
     let elem = document.getElementById(cssId);
 
@@ -322,7 +327,7 @@ Guideline.prototype = {
     if (this.htmlInjected) {
       return;
     }
-    
+
     // if there already exists a guideline-wrapper, throw error
     if (document.querySelector('.guideline-wrapper')) {
       throw new Error('A guideline already exists, it\'s not allowed to run another guideline until the previous one finishes');
@@ -422,15 +427,18 @@ Guideline.prototype = {
   },
 
   // stop play the guideline
-  stop: function stop () {
+  stop: function stop() {
     if (this.isGuiding) {
       this.isGuiding = false;
+
+      const total = this.guideOptions.length;
+      const playLength = this.guideIndex + 1;
       this.guideIndex = -1;
 
       this.destroy();
 
       if (this.callback && typeof this.callback === 'function') {
-        this.callback();
+        this.callback(total, playLength);
       }
     }
   },
@@ -447,7 +455,7 @@ Guideline.prototype = {
   }
 };
 
-function guide (guideOptions, callback) {
+function guide(guideOptions, callback) {
   const gl = new Guideline(guideOptions, callback);
   gl.play();
 };
