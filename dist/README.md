@@ -114,7 +114,7 @@ Properties:
 
 ### callback(total, playedAmount) - guideline(configuration, callback)
 
-`callback` is a function, which will be invoked when the guideline stops. `callback` takes two parameters `total` and `playedAmount`, representing the total amount of valid guidelines and the actual playback amount of guidelines.
+`callback` is a function, which will be invoked when the guideline stops. `callback` takes two parameters `total` and `playedAmount`, representing the total amount of valid hints and the actual playback amount of hints.
 
 ### Guideline instance properties
 

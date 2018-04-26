@@ -4,12 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/) 
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.0.0] - 2018-04-26
 ### Added
 - hasNext api can tell if there is a follow-up hint
 
+### Fixed
+- fix spelling mistakes in readme
+
 ### Changed
-- callback function accepts two parameters, `total` and `playLength`, which represent the total amount of valid hints and the actually played amount of hints
+- callback function takes two parameters `total` and `playedAmount`, representing the total amount of valid hints and the actual played amount of hints
 
 
 ## [0.2.1] - 2018-04-20
